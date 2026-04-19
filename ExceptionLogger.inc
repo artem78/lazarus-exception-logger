@@ -1,0 +1,10 @@
+{$IFDEF CPU64}
+  {$DEFINE LOG_DWARF}
+{$ENDIF}
+{$IF FPC_FULLVERSION>=30301}
+  {$IF DEBUGINFO_TYPE<>NONE}
+    {$if DEBUGINFO_TYPE<>STABS}
+      {$DEFINE LOG_DWARF}
+    {$endif }
+  {$endif}
+{$Endif}

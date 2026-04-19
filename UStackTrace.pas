@@ -2,16 +2,19 @@ unit UStackTrace;
 
 {$mode objfpc}{$H+}
 
+{$I ExceptionLogger.inc}
+
 interface
 
 uses
-  Classes, SysUtils, Contnrs, CustomLineInfo;
+  Classes, SysUtils, Contnrs,
+  {$IFDEF LOG_DWARF}lnfodwrf{$ELSE}CustomLineInfo{$ENDIF};
 
 type
   TStackFrameInfo = class
     Index: Integer;
     LineNumber: Integer;
-    Address: Integer;
+    Address: PtrUInt;
     FunctionClassName: string;
     FunctionName: string;
     Source: string;
@@ -48,7 +51,7 @@ begin
   SourceStr := EmptyStr;
   Func := EmptyStr;
   Success := GetLineInfo(ptruint(Addr), Func, SourceStr, Line);
-  Address := Integer(Addr);
+  Address := PtrUInt(Addr);
   FunctionName := Func;
   if Pos('__', FunctionName) > 0 then begin
     FunctionClassName := Copy(FunctionName, 1, Pos('__', FunctionName) - 1);
@@ -99,7 +102,10 @@ begin
   FrameCount := ExceptFrameCount;
   FramesList := ExceptFrames;
   if FrameCount > MaxDepth then FrameCount := MaxDepth;
-  SetLength(Frames, FrameCount + 1);
+  if FrameCount + 1 < 1 then
+    SetLength(Frames, 1)
+  else
+    SetLength(Frames, FrameCount + 1);
   for FrameNumber := 0 to FrameCount - 1 do begin
     Frames[FrameNumber + 1] := FramesList[FrameNumber]
   end;
