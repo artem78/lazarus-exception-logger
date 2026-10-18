@@ -201,6 +201,7 @@ var
   rowNo, address, method, source, lineNo: string;
 begin
   Result := TStringList.Create;
+  Result.Append('Stack trace:');
   for I := 0 to FStackTrace.Count - 1 do
   begin
     stackFrame := TStackFrameInfo(FStackTrace[I]);
@@ -212,12 +213,14 @@ begin
       source := 'in ' + stackFrame.Source;
     if stackFrame.LineNumber = 0 then
       source := EmptyStr;
-    rowNo := Format('%0.2d', [stackFrame.Index]);
+    //rowNo := Format('%0.2d', [stackFrame.Index]);
+    //rowNo := IntToStr(stackFrame.Index - 1);
     address := IntToHex(stackFrame.Address, sizeof(PtrUInt)*2);
     lineNo := EmptyStr;
     if stackFrame.LineNumber > 0 then
       lineNo := Format('(%d)', [stackFrame.LineNumber]);
-    Line := Format('%s: %s   %s %s %s',[rowNo, address, method, source, lineNo]);
+    //Line := Format('%s: %s   %s %s %s',[rowNo, address, method, source, lineNo]);
+    Line := '  ' + Format('$%s   %s %s %s',[address, method, source, lineNo]).trim;
     Result.Add(Line);
   end;
   Result.Add(EmptyStr);
